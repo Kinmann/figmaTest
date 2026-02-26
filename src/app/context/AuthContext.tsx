@@ -1,31 +1,44 @@
-import { useState, createContext, useContext, ReactNode } from "react";
-import { UserRole, User, users } from "../data/mock";
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+  avatar?: string;
+}
 
 interface AuthContextType {
-  currentUser: User | null;
-  login: (role: UserRole) => void;
+  user: User | null;
+  login: (role: 'admin' | 'user') => void;
   logout: () => void;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const login = (role: UserRole) => {
-    // Find a mock user with this role
-    const user = users.find(m => m.role === role);
-    if (user) {
-      setCurrentUser(user);
-    }
+  const login = (role: 'admin' | 'user') => {
+    const mockUser: User = {
+      id: role === 'admin' ? 'admin-001' : 'user-001',
+      name: role === 'admin' ? 'Admin User' : 'John Doe',
+      email: role === 'admin' ? 'admin@runway.com' : 'john.doe@runway.com',
+      role: role,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${role}`,
+    };
+    setUser(mockUser);
   };
 
   const logout = () => {
-    setCurrentUser(null);
+    setUser(null);
   };
 
+  const isAdmin = user?.role === 'admin';
+
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
@@ -34,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }
