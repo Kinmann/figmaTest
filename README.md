@@ -1,11 +1,90 @@
+# 게임덱스 Runway - 조직 관리 시스템
 
-  # Untitled
+## 프로젝트 소개
 
-  This is a code bundle for Untitled. The original project is available at https://www.figma.com/design/E1mAakSzvKeB4u9eyAVJUc/Untitled.
+MS SSO 로그인, 관리자 페이지, 사용자 페이지 등의 기능을 가진 모던한 멤버십 관리 애플리케이션입니다.
 
-  ## Running the code
+## 주요 기능
 
-  Run `npm i` to install the dependencies.
+### ✨ 디자인
+- 모던한 그라데이션 디자인
+- 글래스모픽 효과
+- 반응형 모바일 레이아웃
+- 애니메이션과 호버 효과
 
-  Run `npm run dev` to start the development server.
-  
+### 📊 대시보드
+- 실시간 통계 카드
+- 최근 활동 로그
+- 부서별 인원 현황
+- 인터랙티브 차트
+
+### 👥 멤버 관리
+- 강력한 검색/필터 기능
+- 멤버 상세 정보 관리
+- 부서/직책/직급 관리
+- 엑셀 데이터 연동
+
+### 🏢 조직 관리
+- 조직 정보 설정
+- 부서 계층 구조 관리
+- 부서 추가/수정/삭제
+- 통계 카드
+
+### 📱 반응형 디자인
+- 모바일 사이드바 오버레이
+- 터치 친화적 UI
+- 반응형 그리드 시스템
+- 완전한 모바일 최적화
+
+## 기술 스택
+
+- **React 18.3.1** - UI 라이브러리
+- **React Router 7** - 라우팅
+- **Tailwind CSS 4** - 스타일링
+- **TypeScript** - 타입 안정성
+- **Radix UI** - 접근성 좋은 컴포넌트
+- **Lucide Icons** - 아이콘
+- **Recharts** - 차트
+- **Sonner** - 토스트 알림
+
+## 설치 및 실행
+
+```bash
+# 의존성 설치
+pnpm install
+
+# 개발 서버 실행
+pnpm dev
+
+# 빌드
+pnpm build
+```
+
+## 프로젝트 구조
+
+```
+src/
+├── app/
+│   ├── components/      # 재사용 가능한 컴포넌트
+│   │   ├── layout/     # 레이아웃 컴포넌트
+│   │   └── ui/         # UI 컴포넌트 라이브러리
+│   ├── context/        # React Context
+│   ├── data/           # 데이터 파일
+│   ├── pages/          # 페이지 컴포넌트
+│   │   ├── admin/     # 관리자 페이지
+│   │   └── user/      # 사용자 페이지
+│   ├── App.tsx         # 메인 앱 컴포넌트
+│   └── routes.tsx      # 라우트 설정
+└── styles/             # 전역 스타일
+```
+
+## 데이터 구조
+
+- **구성원**: 게임덱스 실제 구성원 20명 데이터
+- **부서**: 61개 부서 계층 구조
+- **직책**: 11개 직책 데이터
+- **직급**: 7개 직급 데이터
+
+## 라이센스
+
+MIT
