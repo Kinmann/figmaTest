@@ -1,126 +1,192 @@
 import React from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router';
-import { 
-  Building2, 
-  Users, 
-  UserCircle, 
-  LogOut, 
-  Menu,
-  ChevronRight,
-  Settings
-} from 'lucide-react';
-import { cn } from '../../../lib/utils';
+import { Outlet, useNavigate, useLocation } from 'react-router';
+import { useAuth } from '../../context/AuthContext';
 import { Button } from '../ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Settings,
+  LogOut,
+  Menu,
+  Bell,
+  Search,
+  ChevronRight,
+} from 'lucide-react';
 
 export function AppLayout() {
+  const { user, logout, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = location.pathname.startsWith('/admin');
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
-  const adminLinks = [
-    { to: '/admin/org', icon: Building2, label: 'Organization' },
-    { to: '/admin/members', icon: Users, label: 'Members' },
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const adminNavItems = [
+    { icon: LayoutDashboard, label: '대시보드', path: '/admin/dashboard' },
+    { icon: Users, label: '구성원', path: '/admin/members' },
+    { icon: Building2, label: '조직', path: '/admin/organization' },
+    { icon: Settings, label: '설정', path: '/admin/settings' },
   ];
 
-  const userLinks = [
-    { to: '/app/address-book', icon: Users, label: 'Address Book' },
-    { to: '/app/profile', icon: UserCircle, label: 'My Profile' },
+  const userNavItems = [
+    { icon: LayoutDashboard, label: '대시보드', path: '/app/dashboard' },
+    { icon: Users, label: '주소록', path: '/app/address-book' },
+    { icon: Settings, label: '프로필', path: '/app/profile' },
   ];
 
-  const links = isAdmin ? adminLinks : userLinks;
+  const navItems = isAdmin ? adminNavItems : userNavItems;
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="h-screen flex bg-gray-50">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside 
-        className={cn(
-          "bg-white border-r border-gray-200 transition-all duration-300 flex flex-col z-20",
-          sidebarOpen ? "w-64" : "w-16"
-        )}
+      <aside
+        className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out md:translate-x-0 flex flex-col ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
-          <div className={cn("flex items-center gap-2", !sidebarOpen && "hidden")}>
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">R</div>
-            <span className="font-semibold text-lg text-gray-900">Runway</span>
+        {/* Logo */}
+        <div className="h-16 flex items-center px-6 border-b border-gray-200">
+          <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+            <Building2 className="w-5 h-5" />
           </div>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className={cn(!sidebarOpen && "mx-auto")}
-          >
-            {sidebarOpen ? <Menu size={20} /> : <ChevronRight size={20} />}
-          </Button>
+          <span className="ml-3 text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            게임덱스
+          </span>
         </div>
 
-        <div className="flex-1 py-6 overflow-y-auto">
-          <div className="px-3 space-y-1">
-            <div className={cn("text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3", !sidebarOpen && "hidden")}>
-              {isAdmin ? "Admin Console" : "Workspace"}
-            </div>
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) => cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                  isActive 
-                    ? "bg-blue-50 text-blue-700" 
-                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
-                  !sidebarOpen && "justify-center px-0"
-                )}
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <button
+                key={item.path}
+                onClick={() => {
+                  navigate(item.path);
+                  setSidebarOpen(false);
+                }}
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-200'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
               >
-                <link.icon size={20} />
-                {sidebarOpen && <span>{link.label}</span>}
-              </NavLink>
-            ))}
-          </div>
-        </div>
+                <Icon className="w-5 h-5 mr-3" />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
 
+        {/* User Profile */}
         <div className="p-4 border-t border-gray-200">
-          <NavLink
-            to="/"
-            className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors",
-              !sidebarOpen && "justify-center px-0"
-            )}
-          >
-            <LogOut size={20} />
-            {sidebarOpen && <span>Sign out</span>}
-          </NavLink>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div>
+                <button className="w-full flex items-center p-3 rounded-xl hover:bg-gray-100 transition-colors">
+                  <Avatar className="h-10 w-10 ring-2 ring-blue-100">
+                    <AvatarImage src={user?.avatar} alt={user?.name} />
+                    <AvatarFallback className="bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+                      {user?.name?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="ml-3 text-left flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </button>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>내 계정</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate(isAdmin ? '/admin/settings' : '/app/profile')}>
+                <Settings className="mr-2 h-4 w-4" />
+                설정
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
+                로그아웃
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-10">
-          <h1 className="text-xl font-semibold text-gray-800">
-            {isAdmin ? 'System Administration' : 'Runway Workspace'}
-          </h1>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="text-right hidden md:block">
-                <p className="text-sm font-medium text-gray-900">Alice Admin</p>
-                <p className="text-xs text-gray-500">Super Admin</p>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            {/* Mobile Logo */}
+            <div className="flex items-center md:hidden">
+              <div className="h-8 w-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                <Building2 className="w-4 h-4" />
               </div>
-              <div className="h-9 w-9 rounded-full bg-gray-200 overflow-hidden border border-gray-200">
-                <img 
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" 
-                  alt="Avatar" 
-                  className="h-full w-full object-cover"
-                />
-              </div>
+              <span className="ml-2 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                게임덱스
+              </span>
+            </div>
+            <div className="relative hidden sm:block">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="검색..."
+                className="pl-10 pr-4 py-2 w-64 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </Button>
+            <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full border border-blue-100">
+              <span className="text-xs font-semibold text-blue-700">
+                {isAdmin ? '관리자' : '사용자'}
+              </span>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-auto bg-gray-50 p-6">
+        <main className="flex-1 overflow-y-auto bg-gray-50">
           <Outlet />
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
